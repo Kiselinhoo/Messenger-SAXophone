@@ -14,24 +14,26 @@ services:
       retries: 10
 
   backend:
-    build:
-      context: ./backend
+    build: ./backend
     restart: unless-stopped
     environment:
       AUTH_SECRET_KEY: dev-secret-key-change-me-in-production
       DATABASE_URL: postgresql+psycopg://postgres:postgres@db:5432/messenger
+    # Если прямой доступ к API с хоста нужен — оставьте строку ниже.
+    # Если нет — эту строку можно удалить, фронтенд общается с backend по внутренней сети.
     ports:
-      - 18000:18000
+      - "18000:8000"          # хост:контейнер (8000 — порт uvicorn)
     depends_on:
       db:
         condition: service_healthy
 
   frontend:
-    build:
-      context: ./frontend
+    build: ./frontend
     restart: unless-stopped
     ports:
-      - 13000:13000
+      - "13000:80"            # хост:контейнер (80 — порт nginx)
+    depends_on:
+      - backend
 
 volumes:
   postgres_data:
