@@ -26,16 +26,20 @@ app.add_middleware(
 )
 
 
+def error_body(code: str, message: str) -> dict[str, dict[str, str]]:
+    return {
+        "error": {
+            "code": code,
+            "message": message,
+        }
+    }
+
+
 @app.exception_handler(HTTPException)
 async def http_error(request: Request, exc: HTTPException):
     return JSONResponse(
         status_code=exc.status_code,
-        content={
-            "error": {
-                "code": f"http_{exc.status_code}",
-                "message": str(exc.detail),
-            }
-        },
+        content=error_body(f"http_{exc.status_code}", str(exc.detail)),
         headers=exc.headers,
     )
 
@@ -46,12 +50,7 @@ async def validation_error(request: Request, exc: RequestValidationError):
 
     return JSONResponse(
         status_code=status,
-        content={
-            "error": {
-                "code": "validation_error",
-                "message": "Invalid request",
-            }
-        },
+        content=error_body("validation_error", "Invalid request"),
     )
 
 
@@ -65,12 +64,7 @@ async def unexpected_error(request: Request, exc: Exception):
 
     return JSONResponse(
         status_code=500,
-        content={
-            "error": {
-                "code": "internal_error",
-                "message": "Internal server error",
-            }
-        },
+        content=error_body("internal_error", "Internal server error"),
     )
 
 

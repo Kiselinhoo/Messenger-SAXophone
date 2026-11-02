@@ -1,5 +1,7 @@
+from collections.abc import Iterator
+
 from sqlalchemy import create_engine
-from sqlalchemy.orm import DeclarativeBase, sessionmaker
+from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
 from app.config import get_settings
 
@@ -17,7 +19,7 @@ engine = create_engine(
 SessionLocal = sessionmaker(bind=engine)
 
 
-def get_db():
+def get_db() -> Iterator[Session]:
     # Сессия принадлежит одному запросу, после него соединение возвращается в пул.
     with SessionLocal() as db:
         yield db

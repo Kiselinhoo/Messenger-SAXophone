@@ -1,3 +1,5 @@
+from unittest.mock import Mock
+
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.exc import OperationalError
@@ -26,14 +28,15 @@ def test_missing_route(client):
 
 
 def test_ready_with_database(client):
-    class AvailableDB:
-        def execute(self, statement):
-            return None
-
-    app.dependency_overrides[get_db] = lambda: AvailableDB()
+    database = Mock()
+    app.dependency_overrides[get_db] = lambda: database
     response = client.get('/ready')
     assert response.status_code == 200
     assert response.json() == {'status': 'ok', 'database': 'ok'}
+
+    database.execute.assert_called_once()
+    statement = database.execute.call_args.args[0]
+    assert str(statement) == 'SELECT 1'
 
 
 def test_ready_without_database(client):
