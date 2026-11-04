@@ -31,7 +31,7 @@ services:
     build: ./frontend
     restart: unless-stopped
     ports:
-      - "13000:80"            # хост:контейнер (80 — порт nginx)
+      - "80:80"            # хост:контейнер (80 — порт nginx)
     depends_on:
       - backend
 
