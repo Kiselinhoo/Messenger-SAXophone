@@ -105,8 +105,9 @@ input[aria-invalid="true"]:focus-visible { box-shadow: 0 0 0 3px rgba(199,83,91,
 .empty-chat p + p { margin-top: 2px; }
 .empty-chat .text-action { margin-top: 24px; }
 .chat-page { flex: 1; padding: 32px; display: flex; flex-direction: column; min-height: 550px; }
-.chat-page h1 { font-size: 24px; }
-.message-area { flex: 1; display: grid; place-items: center; color: var(--muted); text-align: center; padding: 48px 0; font-size: 14px; }
+.chat-page h1 { font-size: 24px; overflow-wrap: anywhere; }
+.message-area { flex: 1; max-height: 55vh; overflow-y: auto; padding: 16px 0; font-size: 14px; }
+.message-area p { margin: 0 0 10px; white-space: pre-wrap; overflow-wrap: anywhere; }
 .message-input { padding: 18px; border: 1px solid var(--line); border-radius: 12px; background: #fff; }
 .message-input label { font-size: 12px; font-weight: 650; }
 .message-input textarea { display: block; margin: 12px 0; resize: vertical; }
@@ -131,7 +132,7 @@ input[aria-invalid="true"]:focus-visible { box-shadow: 0 0 0 3px rgba(199,83,91,
   .brand-symbol span:nth-child(2) { height: 25px; }
   .primary-nav { display: flex; gap: 4px; }
   .primary-nav a { width: 44px; height: 44px; padding: 12px; font-size: 0; gap: 0; }
-  .sidebar-title, .settings-list { display: none; }
+  .sidebar-title, .sidebar .settings-list { display: none; }
   .sidebar-empty { grid-column: 1 / -1; padding: 0 0 16px; }
   .sidebar-empty-icon, .sidebar-empty p:first-of-type { display: none; }
   .sidebar-empty p:last-child { margin: 0; font-size: 12px; }

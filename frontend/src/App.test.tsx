@@ -41,7 +41,7 @@ describe('вход и защищённые страницы', () => {
     renderApp('/profile')
     expect(screen.getByText('Загружаем профиль…')).toBeInTheDocument()
     finish(response(user))
-    expect(await screen.findByText('Алиса')).toBeInTheDocument()
+    expect(await screen.findByText('Алиса', { selector: 'dd' })).toBeInTheDocument()
   })
   it('перенаправляет гостя с профиля на вход без запроса профиля', async () => {
     const fetch = mockApi()
@@ -53,7 +53,7 @@ describe('вход и защищённые страницы', () => {
     sessionStorage.setItem(tokenKey, 'saved-token')
     const fetch = mockApi(() => response(user))
     renderApp('/profile')
-    expect(await screen.findByText('Алиса')).toBeInTheDocument()
+    expect(await screen.findByText('Алиса', { selector: 'dd' })).toBeInTheDocument()
     const call = fetch.mock.calls.find(([path]) => path === '/api/users/me')
     expect(new Headers(call?.[1]?.headers).get('Authorization')).toBe('Bearer saved-token')
   })
@@ -73,7 +73,7 @@ describe('вход и защищённые страницы', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('Не удалось загрузить профиль')
     offline = false
     fireEvent.click(screen.getByRole('button', { name: 'Повторить загрузку' }))
-    expect(await screen.findByText('Алиса')).toBeInTheDocument()
+    expect(await screen.findByText('Алиса', { selector: 'dd' })).toBeInTheDocument()
   })
   it('входит, открывает профиль и выходит с удалением токена', async () => {
     mockApi(path => path === '/api/auth/login' ? response({ access_token: 'new-token', user }) : response(null, 204))

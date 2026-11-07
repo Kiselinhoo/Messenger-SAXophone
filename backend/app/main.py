@@ -12,11 +12,13 @@ from starlette.exceptions import HTTPException
 from app.config import get_settings
 from app.db import get_db
 from app.auth import router as auth_router, users_router
+from app.chats import router as chats_router
 
 
 app = FastAPI(title="Messenger SAXophone", version="0.1.0")
 app.include_router(auth_router)
 app.include_router(users_router)
+app.include_router(chats_router)
 
 app.add_middleware(
     CORSMiddleware,
@@ -46,7 +48,7 @@ async def http_error(request: Request, exc: HTTPException):
 
 @app.exception_handler(RequestValidationError)
 async def validation_error(request: Request, exc: RequestValidationError):
-    status = 400 if request.url.path.startswith(("/auth/", "/users")) else 422
+    status = 400 if request.url.path.startswith(("/auth/", "/users", "/chats/")) else 422
 
     return JSONResponse(
         status_code=status,
