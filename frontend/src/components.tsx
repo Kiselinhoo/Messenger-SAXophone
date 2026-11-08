@@ -1,19 +1,18 @@
 import React from 'react';
 
-// Мелкая правка: добавил интерфейс ButtonProps, чтобы TypeScript понимал, какие данные принимает кнопка.
+// Мелкая правка: добавил интерфейс ButtonProps для типизации.
+// Это нужно, чтобы TypeScript понимал, какие данные принимает кнопка.
 interface ButtonProps {
   text: string;
   onClick?: () => void;
   disabled?: boolean;
 }
 
-// Кнопка. Сделал пропс disabled, чтобы нельзя было нажать дважды при отправке формы.
+// Правка по ревью: уточнил комментарий. 
+// Кнопка поддерживает блокировку (disabled), но состоянием загрузки управляет родительская форма, 
+// которая передает сюда этот пропс. 
 export const Button: React.FC<ButtonProps> = ({ text, onClick, disabled = false }) => (
-  <button 
-    onClick={onClick} 
-    disabled={disabled}
-    style={{ padding: '10px', margin: '5px', cursor: disabled ? 'not-allowed' : 'pointer' }}
-  >
+  <button onClick={onClick} disabled={disabled} className="button">
     {text}
   </button>
 );
@@ -28,27 +27,24 @@ interface InputProps {
 }
 
 // Поле ввода. Добавил пропс error, чтобы подсвечивать красным, если пользователь ошибся.
+// Использую классы "field" и "input" из styles.css для красивого отображения.
 export const Input: React.FC<InputProps> = ({ label, value, onChange, error, type = 'text' }) => (
-  <div style={{ marginBottom: '10px' }}>
-    <label style={{ display: 'block' }}>{label}</label>
-    <input 
-      type={type}
-      value={value} 
-      onChange={onChange} 
-      style={{ border: error ? '1px solid red' : '1px solid #ccc', padding: '5px' }}
-    />
-    {error && <div style={{ color: 'red', fontSize: '12px' }}>{error}</div>}
+  <div className="field">
+    {/* Связываю label с полем ввода для доступности */}
+    <label>{label}</label>
+    <input type={type} value={value} onChange={onChange} aria-invalid={!!error} />
+    {/* Если есть текст ошибки, вывожу его красным цветом */}
+    {error && <small role="alert">{error}</small>}
   </div>
 );
 
-// Мелкая правка: добавил интерфейс CardProps, чтобы указать, что карточка принимает внутри себя другие элементы (children).
+// Мелкая правка: добавил интерфейс CardProps, чтобы указать, что карточка принимает внутри себя другие элементы.
 interface CardProps {
   children: React.ReactNode;
 }
 
-// Карточка. Просто обертка, чтобы форма по центру была. Захардкодил ширину 300px.
+// Карточка. Просто обертка, чтобы форма была по центру экрана. 
+// Использую класс "card" из styles.css.
 export const Card: React.FC<CardProps> = ({ children }) => (
-  <div style={{ border: '1px solid #ccc', padding: '20px', width: '300px', margin: '50px auto' }}>
-    {children}
-  </div>
+  <div className="card">{children}</div>
 );
