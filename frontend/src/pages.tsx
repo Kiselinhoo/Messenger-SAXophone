@@ -7,71 +7,65 @@ interface AuthPageProps {
 }
 
 export const AuthPage: React.FC<AuthPageProps> = ({ onLogin }) => {
+  // Создаю состояния для полей ввода, текста ошибки и индикатора загрузки.
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Функция, которая срабатывает при нажатии на кнопку "Войти" или Enter.
-  // Здесь я сначала очищаю старые ошибки, включаю загрузку, 
-  // а потом проверяю, не пустые ли поля.
+  // ПЗ №5 (Extract Method): Вынес проверку полей в отдельную функцию.
+  // Это уменьшило размер handleSubmit и улучшило читаемость кода.
+  const validateFields = (): boolean => {
+    // Проверяю, что пользователь ввел хоть какие-то данные.
+    if (!login || !password) {
+      setError('Заполните все поля');
+      return false;
+    }
+    return true;
+  };
+
+  // Главная функция, которая срабатывает при нажатии на кнопку "Войти" или Enter.
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    setLoading(true);
+    setError(''); // Очищаю старые ошибки
+    
+    // Вызываю функцию валидации. Если поля пустые, она вернет false и прервет отправку.
+    if (!validateFields()) return;
 
-    // Проверяю, что пользователь ввел хоть какие-то данные.
-    // Если хотя бы одно поле пустое, то сразу вывожу ошибку и выключаю загрузку,
-    // чтобы не отправлять пустой запрос на сервер.
-    if (login === '' || password === '') {
-      setError('Заполните все поля');
-      setLoading(false);
-      return;
-    }
-
+    setLoading(true); // Включаю загрузку (кнопка блокируется)
+    
     // Отправляю данные на сервер через функцию onLogin, которую передали сверху.
-    // Если сервер ответит ошибкой, то сработает блок catch, и я покажу красный текст.
-    // В любом случае, после завершения запроса выключаю загрузку в блоке finally.
     try {
-      await onLogin(login, password); 
-    } catch (error) {
-      // Мелкая правка: добавил console.log, чтобы err не считался неиспользуемым
-      console.log(error);
-      setError('Неверный логин или пароль');
+      await onLogin(login, password);
+    } catch (err) {
+      console.log(err);
+      // Правка по ревью: разделяем ошибки. Если 401 — неверный пароль, иначе — проблема с сетью/сервером.
+      if (err instanceof Error && err.message.includes('401')) {
+        setError('Неверный логин или пароль');
+      } else {
+        setError('Ошибка соединения. Проверьте сеть и попробуйте позже.');
+      }
     } finally {
+      // В любом случае выключаю загрузку, чтобы кнопка снова стала активной.
       setLoading(false);
     }
   };
 
-  // Вся верстка формы обернута в компонент Card (мою белую карточку по центру).
-  // Внутри формы использую мои же компоненты Input и Button.
   return (
     <Card>
-      <h2>Вход</h2>
+      <h1>Вход</h1>
       <form onSubmit={handleSubmit}>
-        {/* Поле для ввода логина. Связываю его со стейтом login, чтобы React знал, что там написано. */}
-        <Input 
-          label="Логин" 
-          value={login} 
-          onChange={(e) => setLogin(e.target.value)} 
-        />
-        {/* Поле для пароля. Тип password скрывает символы точками. Привязано к стейту password. */}
-        <Input 
-          label="Пароль" 
-          type="password"
-          value={password} 
-          onChange={(e) => setPassword(e.target.value)} 
-        />
+        {/* Поле для ввода логина. Связываю его со стейтом login. */}
+        <Input label="Логин" value={login} onChange={(e) => setLogin(e.target.value)} />
         
-        {/* Если в стейте error есть текст, то показываю красный блок с ошибкой. */}
-        {/* Стили пишу прямо в теге, чтобы не подключать отдельный CSS-файл. */}
-        {error && <div style={{ color: 'red', marginBottom: '10px' }}>{error}</div>}
+        {/* Поле для пароля. Тип password скрывает символы точками. */}
+        <Input label="Пароль" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+        
+        {/* Если в стейте error есть текст, показываю красный блок с ошибкой (стили из styles.css). */}
+        {error && <div className="form-error" role="alert">{error}</div>}
         
         {/* Кнопка "Войти". Если идет загрузка, она меняет текст и становится неактивной. */}
-        <Button 
-          text={loading ? 'Загрузка...' : 'Войти'} 
-          disabled={loading} 
-        />
+        <Button text={loading ? 'Загрузка...' : 'Войти'} disabled={loading} />
       </form>
     </Card>
   );
