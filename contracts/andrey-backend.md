@@ -1,7 +1,11 @@
 Контракт Андрея. S4-03. Каркас backend.
 
-Запуск из каталога backend:
-python -m uvicorn app.main:app --reload
+При прямом запуске из каталога `backend` сначала примените миграции к базе, указанной в `DATABASE_URL`.
+Сервер запустится только после успешного завершения миграций.
+
+```bash
+alembic upgrade head && python -m uvicorn app.main:app --reload
+```
 
 Точка входа:
 app.main:app — объект FastAPI.
