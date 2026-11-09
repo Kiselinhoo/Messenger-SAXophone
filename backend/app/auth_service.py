@@ -41,7 +41,6 @@ def login_user(
         expires_at=expires_at,
     )
     db.add(session)
-    db.commit()
 
     expires_in = get_settings().access_token_minutes * 60
     return user, token, expires_in

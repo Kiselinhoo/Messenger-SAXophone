@@ -93,12 +93,15 @@ def register(data: RegisterRequest, db: Session = Depends(get_db)):
 @router.post("/login", response_model=LoginResponse)
 def login(data: LoginRequest, response: Response, db: Session = Depends(get_db)):
     user, token, expires_in = login_user(db, data.identity, data.password)
-    response.headers["Cache-Control"] = "no-store"
-    return LoginResponse(
+
+    login_response = LoginResponse(
         access_token=token,
         expires_in=expires_in,
         user=UserPublic.model_validate(user),
     )
+    db.commit()
+    response.headers["Cache-Control"] = "no-store"
+    return login_response
 
 
 @router.post("/logout", status_code=204)
